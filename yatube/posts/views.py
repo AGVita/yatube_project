@@ -1,33 +1,22 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.conf import settings
 
-from django.http import HttpResponse
-
-# Create your views here.
+from .models import Post, Group
 
 
 def index(request):
-    template = 'posts/index.html'
+    posts = Post.objects.all()[:settings.POST_COUNT]
     context = {
-        'title': "Это главная страница проекта Yatube"
+        'posts': posts
     }
-    return render(request, template, context)
-    # return HttpResponse(
-    #     'Ты <i>не можешь</i> получить правильные <b>ответы</b>,<br> '
-    #     'если у тебя нет правильных <s>вопросов</s> запросов.'
-    # )
+    return render(request, 'posts/index.html', context)
 
 
-def group_posts(request):
-    template = 'posts/group_list.html'
+def group_posts(request, slug):
+    group = get_object_or_404(Group, slug=slug)
+    posts = group.posts.all()[:settings.POST_COUNT]
     context = {
-        'title': "Здесь будет информация о группах проекта Yatube"
+        'group': group,
+        'posts': posts,
     }
-    return render(request, template, context)
-
-
-def general_page(request, slug):
-    template = 'posts/group_list.html'
-    context = {
-        'title': "Здесь будет информация о группах проекта Yatube"
-    }
-    return render(request, template, context)
+    return render(request, 'posts/group_list.html', context)
